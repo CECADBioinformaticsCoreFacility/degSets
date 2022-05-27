@@ -22,8 +22,9 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: get colourscaler
-        run: Rscript -e "install.packages('remotes'); remotes::install_github('richardJActon/colourscaler')"
+      - name: get colourScaleR
+        run: Rscript -e "install.packages('remotes')"
+        run: Rscript -e "remotes::install_github('RichardJActon/colourScaleR')"
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
