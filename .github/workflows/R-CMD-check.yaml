@@ -15,6 +15,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
     steps:
+        
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-r@v1
@@ -24,5 +25,8 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
           extra-packages: rcmdcheck
+
+      - name: get colourscaler
+        run: Rscript -e "install.packages('richardJActon/colourscaler')"
 
       - uses: r-lib/actions/check-r-package@v1
