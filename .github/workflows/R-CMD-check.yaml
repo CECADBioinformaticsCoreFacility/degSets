@@ -23,7 +23,7 @@ jobs:
           use-public-rspm: true
 
       - name: get remotes
-        run: Rscript -e "install.packages('remotes')"
+        run: Rscript -e "install.packages(c('remotes', 'scales'))"
       - name: get colourScaleR
         run: Rscript -e "remotes::install_github('RichardJActon/colourScaleR')"
 
