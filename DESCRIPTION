@@ -1,0 +1,34 @@
+Package: degSets
+Title: Differentially Expressed Gene Sets
+Version: 0.0.0.9000
+Authors@R: person('Richard', 'Acton', email = 'racton@uni-koeln.de', role = c('cre', 'aut'), comment = c(ORCID = '0000-0002-2574-9611'))
+Description: Visualise the overlap between differentially expressed genes in different comparisons with Venn and UpSet plots.
+License: AGPL (>= 3)
+Imports: 
+    bs4Dash,
+    colourScaleR,
+    ComplexHeatmap,
+    config (>= 0.3.1),
+    dplyr,
+    DT,
+    golem (>= 0.3.1),
+    purrr,
+    readr,
+    rlang,
+    shiny (>= 1.7.1),
+    shinyWidgets,
+    stringr,
+    tibble,
+    tidyr,
+    upsetjs,
+    waiter
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+URL: https://renkulab.io/gitlab/racton/degSets
+BugReports: https://renkulab.io/gitlab/racton/degSets/issues
+Suggests: 
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Language: en-US
