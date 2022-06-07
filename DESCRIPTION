@@ -31,6 +31,7 @@ URL: https://renkulab.io/gitlab/racton/degSets,
     https://cecadbioinformaticscorefacility.github.io/degSets
 BugReports: https://renkulab.io/gitlab/racton/degSets/issues
 Suggests: 
+    covr,
     spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

@@ -3,6 +3,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/CECADBioinformaticsCoreFacility/degSets/workflows/R-CMD-check/badge.svg)](https://github.com/CECADBioinformaticsCoreFacility/degSets/actions)
+[![Codecov test coverage](https://codecov.io/gh/CECADBioinformaticsCoreFacility/degSets/branch/master/graph/badge.svg)](https://app.codecov.io/gh/CECADBioinformaticsCoreFacility/degSets?branch=master)
 <!-- badges: end -->
 
 The goal of degSets is to ...
