@@ -168,7 +168,7 @@ results_table_DT <- function(
 				), 
 				searchCols = c(
 					vector(mode = "list", length = 6),
-					list(list(search = '0.000 ... 0.050')),
+					# list(list(search = '0.000 ... 0.050')),
 					vector(mode = "list", length = 12)
 				),
 				buttons = list(
