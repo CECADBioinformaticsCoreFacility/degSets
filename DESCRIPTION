@@ -6,6 +6,7 @@ Description: Visualise the overlap between differentially expressed genes in dif
 License: AGPL (>= 3)
 biocViews:
 Imports: 
+    BiocManager,
     bs4Dash,
     colourScaleR,
     ComplexHeatmap,

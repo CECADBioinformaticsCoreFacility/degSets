@@ -4,6 +4,7 @@
 #'     DO NOT REMOVE.
 #'     
 #' @import utils
+#' @importFrom BiocManager install
 #' @noRd
 app_server <- function( input, output, session ) {
 	# Your application server logic 
