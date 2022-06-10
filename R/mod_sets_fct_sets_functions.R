@@ -142,7 +142,7 @@ results_table_DT <- function(
 			filter = "top",  # allows filtering on each column
 			extensions = c(
 				"Buttons",  # add download buttons, etc
-				"Select",
+				#"Select",
 				"Scroller"  # for scrolling down the rows rather than pagination
 			),
 			selection = 'none',
@@ -174,7 +174,7 @@ results_table_DT <- function(
 				buttons = list(
 					I("colvis"),  # turn columns on and off
 					# "selectRows",
-					"selectNone",
+					#"selectNone",
 					"csv",  # download as .csv
 					"excel"  # download as .xlsx
 				)

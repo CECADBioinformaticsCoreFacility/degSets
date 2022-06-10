@@ -27,3 +27,7 @@ library(degSets)
 degSets::run_app()
 ```
 
+## Hosted Instance
+
+You can find an example instance of degSets hosted at [shinyapps.io](https://richardjacton.shinyapps.io/degSets/)
+

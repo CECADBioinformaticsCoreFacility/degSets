@@ -16,8 +16,8 @@ mod_sets_ui_body <- function(id){
 			### UpSet plot box ----
 			bs4Dash::box(
 				width = 6,
-				title = "UpSet plot",
-				solidHeader = TRUE,
+				title = shiny::h3("UpSet plot"),
+				solidHeader = FALSE,
 				status = "primary",
 				# h4(textOutput("upset_plot_selected")),
 				#"Box body",
@@ -31,8 +31,8 @@ mod_sets_ui_body <- function(id){
 			### Venn plot box ----
 			bs4Dash::box(
 				width = 6,
-				title = "Venn Diagram",
-				solidHeader = TRUE,
+				title = shiny::h3("Venn Diagram"),
+				solidHeader = FALSE,
 				status = "primary",
 				#"Box body",
 				id = ns("venn_diagram_box"),
@@ -403,6 +403,7 @@ mod_sets_server <- function(id) {
 				dplyr::group_by(.data$comparison) %>%
 				named_group_split(.data$comparison) %>%
 				#dplyr::group_split(.keep = FALSE) %>%
+				purrr::set_names(unique(df$comparison)) %>%
 				purrr::map(~{
 					.x %>% 
 						dplyr::select(-.data$comparison) %>%
@@ -418,7 +419,8 @@ mod_sets_server <- function(id) {
 							)),
 							padj_range = c(0, quantile(
 								df$padj, probs = c(0.75), na.rm = TRUE
-							))
+							))#,
+							#elementId = ns(.x$comparison[1])
 						)
 				})
 		}) 
@@ -426,29 +428,21 @@ mod_sets_server <- function(id) {
 		### DEG results tables render ----
 		output$dge_res <- renderUI({
 			req(input$results_annotated_min_cov_grp)
-			do.call("tabBox",
-					c(
-						width = 12,
-						id = ns("tabcard"),
-						title = "Differential Gene Expression Results",
-						maximizable = TRUE,
-						solidHeader = TRUE,
-						status = "primary",
-						selected = tail(input$comparisons, 1),
-						type = "tabs",
-						purrr::map2(
-							input$comparisons, seq_along(input$comparisons), ~{
-								tabPanel(
-									title = .x,
-									DT::renderDataTable(
-										results_annotated_min_cov_grp_DTs(
-										)[[.x]],
-										server = FALSE
-									)
-								)
-							}
-						)
-					)
+			lst_of_tbls <- purrr::map(input$comparisons, ~{tabPanel(
+				title = .x, DT::renderDataTable(
+					results_annotated_min_cov_grp_DTs()[[.x]], server = TRUE
+				)
+			)}) 
+			tabBox(
+				width = 12,
+				id = "tabcard",
+				title = shiny::h3("Differential Gene Expression Results"),
+				maximizable = TRUE,
+				solidHeader = FALSE,
+				status = "primary",
+				selected = tail(input$comparisons, 1),
+				type = "tabs",
+				.list = lst_of_tbls
 			)
 		})
 	})

@@ -1,0 +1,13 @@
+name: degSets
+title: degSets
+username:
+account: richardjacton
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6444294
+bundleId: 5984988
+url: https://richardjacton.shinyapps.io/degSets/
+when: 1654596655.26244
+lastSyncTime: 1654596655.26244
+asMultiple: FALSE
+asStatic: FALSE
