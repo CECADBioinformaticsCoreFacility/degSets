@@ -144,9 +144,13 @@ mod_sets_server <- function(id) {
 		direction_filter <- reactive({
 			switch(
 				input$directional,
-				"Up-regulated" = \(x) dplyr::filter(x, .data$log2FoldChange > 0),
-				"Either" = \(x) dplyr::filter(x), 
-				"Down Regulated" = \(x) dplyr::filter(x, .data$log2FoldChange < 0)
+				"Up-regulated" = \(x) dplyr::filter(
+					x, .data$log2FoldChange > 0
+				),
+				"Either" = \(x) x, 
+				"Down Regulated" = \(x) dplyr::filter(
+					x, .data$log2FoldChange < 0
+				)
 			)
 		})
 		
@@ -209,32 +213,34 @@ mod_sets_server <- function(id) {
 				input$minlog2FoldChange,
 				input$maxlog2FoldChange
 			)
+			
+			# all
 			results_annotated_min_cov_grp() %>%
-				dplyr::group_by(.data$comparison) %>%
-				dplyr::filter(
-					.data$padj < input$padj,
-					.data$log2FoldChange <= input$minlog2FoldChange | 
-						.data$log2FoldChange >= input$maxlog2FoldChange
-				) %>%
-				direction_filter()()
+				dge_filters(
+					direction_filter(), input$padj,
+					input$minlog2FoldChange, input$maxlog2FoldChange
+				)
+			
+			# any
+			# results_annotated_min_cov_grp() %>%
+			# 	direction_filter()() %>%
+			# 	dplyr::filter(
+			# 		padj < input$padj,
+			# 		log2FoldChange <= input$minlog2FoldChange |
+			# 			log2FoldChange >= input$maxlog2FoldChange
+			# 	) %>%
+			# 	dplyr::group_by(comparison) 
 		})
 		
 		## Gene Names Set List ----
 		significant_genes_by_comparison_lst <- reactive({
 			significant_genes_by_comparison() %>%
-				dplyr::select(.data$comparison, .data$symbol) %>%
-				tidyr::nest() %>%
-				dplyr::mutate(
-					data = data %>% 
-						purrr::set_names(.data$comparison) %>% 
-						purrr::map(~.x$symbol)
-				) %>%
-				dplyr::pull(.data$data)
+				get_significant_genes_by_comparison_lst()
 		})
 		
 		## Number of genes by set ----
 		number_of_significant_genes_by_comparison <- reactive({
-			significant_genes_by_comparison %>% 
+			significant_genes_by_comparison() %>% 
 				dplyr::count()
 		})
 		
@@ -252,13 +258,15 @@ mod_sets_server <- function(id) {
 		})
 		
 		## Selected Comparisons ----
-		significant_genes_by_comparison_lst_subset <- reactive(
+		significant_genes_by_comparison_lst_subset <- reactive({
+			req(input$comparisons)
 			significant_genes_by_comparison_lst()[input$comparisons]
-		)
+		})
 		
 		## set combinations ----
 		set_combinations <- reactive({
-			req(input$results_annotated_min_cov_grp)
+			# req(input$results_annotated_min_cov_grp)
+			# req(significant_genes_by_comparison_lst_subset())
 			set_list_2_combinations(
 				significant_genes_by_comparison_lst_subset()
 			)
@@ -279,7 +287,7 @@ mod_sets_server <- function(id) {
 		###
 		
 		output$set_selector <- renderUI({
-			req(input$results_annotated_min_cov_grp)
+			#req(input$results_annotated_min_cov_grp)
 			selectInput(
 				selectize = TRUE,
 				ns("set_2_highlight"), "Set to highlight",
@@ -333,35 +341,21 @@ mod_sets_server <- function(id) {
 		## UpSet Plot render ----
 		output$upset_plot <- upsetjs::renderUpsetjs({
 			req(input$set_2_highlight) #input$dark_mode
-			upsetjs::upsetjs() %>% 
-				upsetjs::fromList(
-					significant_genes_by_comparison_lst_subset()
-				) %>% 
-				upsetjs::setSelection(
-					set_combinations()[[input$set_2_highlight]]
-				) %>% 
-				upsetjs::chartTheme(
-					#theme = if_else(input$dark_mode, "dark", "light"),
-					selection.color = "#587792", hover.hint.color = "#8DB1AB"
-				) %>%
-				upsetjs::interactiveChart()
+			gen_upset_plot(
+				significant_genes_by_comparison_lst_subset(),
+				set_combinations(),
+				input$set_2_highlight
+			)
 		})
 		
 		## Venn diagram render ----
 		output$venn_diagram <- upsetjs::renderUpsetjs({
 			req(input$set_2_highlight) # input$dark_mode
-			upsetjs::upsetjsVennDiagram() %>% 
-				upsetjs::fromList(
-					significant_genes_by_comparison_lst_subset()
-				) %>% 
-				upsetjs::setSelection(
-					set_combinations()[[input$set_2_highlight]]
-				) %>% 
-				upsetjs::chartTheme(
-					#theme = if_else(input$dark_mode, "dark", "light"),
-					selection.color = "#587792", hover.hint.color = "#8DB1AB"
-				) %>%
-				upsetjs::interactiveChart()
+			gen_venn(
+				significant_genes_by_comparison_lst_subset(),
+				set_combinations(),
+				input$set_2_highlight
+			)
 		})
 		
 		## selected condition gene list render ----
@@ -382,8 +376,11 @@ mod_sets_server <- function(id) {
 		
 		### DEG results tables DT prep ----
 		results_annotated_min_cov_grp_DTs <- reactive({
-			req(input$results_annotated_min_cov_grp)
-			df <- significant_genes_by_comparison() %>%
+			# req(input$results_annotated_min_cov_grp)
+			# req(significant_genes_by_comparison())
+			df <- 
+				significant_genes_by_comparison() %>% # all
+				#results_annotated_min_cov_grp() %>% # any
 				dplyr::filter(.data$symbol %in% intersection_selected_sets())	
 			###!!! alternative source for elems!
 			# if (!is.null(input$upset_plot_click$elems)) {
@@ -427,7 +424,9 @@ mod_sets_server <- function(id) {
 		
 		### DEG results tables render ----
 		output$dge_res <- renderUI({
-			req(input$results_annotated_min_cov_grp)
+			req(input$comparisons)
+			# req(input$results_annotated_min_cov_grp)
+			# req(results_annotated_min_cov_grp_DTs())
 			lst_of_tbls <- purrr::map(input$comparisons, ~{tabPanel(
 				title = .x, DT::renderDataTable(
 					results_annotated_min_cov_grp_DTs()[[.x]], server = TRUE

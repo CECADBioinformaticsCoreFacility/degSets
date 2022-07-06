@@ -1,0 +1,10 @@
+gene_id,baseMean,log2FoldChange,lfcSE,pvalue,padj,seqnames,start,end,width,strand,gene_name,gene_biotype,seq_coord_system,description,symbol,entrezid,comparison
+prefix001,10,1,0.5,0.01,0.01,chr1,0,1000,1000,+,abc1,protein_coding,chromosome,a gene,abc1,001,A_vs_B
+prefix002,10,-1,0.5,0.5,0.5,chr1,0,1000,1000,+,def2,protein_coding,chromosome,a gene,def2,002,A_vs_B
+prefix003,10,0.02,0.5,1,1,chr1,0,1000,1000,+,ghi3,protein_coding,chromosome,a gene,ghi3,003,A_vs_B
+prefix001,10,1,0.5,0.01,0.01,chr1,0,1000,1000,+,abc1,protein_coding,chromosome,a gene,abc1,001,A_vs_C
+prefix002,10,-1,0.5,0.5,0.5,chr1,0,1000,1000,+,def2,protein_coding,chromosome,a gene,def2,002,A_vs_C
+prefix003,10,0.02,0.5,1,1,chr1,0,1000,1000,+,ghi3,protein_coding,chromosome,a gene,ghi3,003,A_vs_C
+prefix001,10,1,0.5,0.01,0.01,chr1,0,1000,1000,+,abc1,protein_coding,chromosome,a gene,abc1,001,B_vs_C
+prefix002,10,-1,0.5,0.5,0.5,chr1,0,1000,1000,+,def2,protein_coding,chromosome,a gene,def2,002,B_vs_C
+prefix003,10,0.02,0.5,1,1,chr1,0,1000,1000,+,ghi3,protein_coding,chromosome,a gene,ghi3,003,B_vs_C

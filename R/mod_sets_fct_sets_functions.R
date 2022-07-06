@@ -226,7 +226,7 @@ named_group_split <- function(.tbl, ...) {
 	
 	grouped %>% 
 		group_split() %>% 
-		rlang::set_names(.data$names)
+		rlang::set_names(names)
 }
 
 #' bind_cols_fill
@@ -370,3 +370,112 @@ set_selected_set_2_inputs <- function(x, upset, venn){
 # set_selected_set_2_inputs("",    "A&B", "C&D")
 # set_selected_set_2_inputs("",    "A&B", "C&D")
 # set_selected_set_2_inputs("C&D", "A&B", "C&D")
+#' dge_filters
+#'
+#' applies filters for adjusted p-value, direction and log2 Fold Change to 
+#' differential gene expression data
+#'
+#' @param data results_annotated_min_cov_grp
+#' @param dir_filter dplyr function function for a particualt direction
+#' @param padjt minimum adjusted p-value
+#' @param lowerlfc lower log2 Fold Change cut-off
+#' @param upperlfc upper log2 Fold Change cut-off
+#'
+#' @return filtered tibble
+#' 
+#' @export
+#' 
+#' @importFrom rlang .data
+#' @importFrom dplyr filter group_by
+#'
+dge_filters <- function(data, dir_filter, padjt, lowerlfc, upperlfc) {
+	data %>% 
+		dplyr::group_by(.data$comparison) %>%
+		dir_filter() %>%
+		dplyr::filter(
+			.data$padj <= padjt,
+			.data$log2FoldChange <= lowerlfc | .data$log2FoldChange >= upperlfc
+		)
+}
+
+#' get_significant_genes_by_comparison_lst
+#'
+#' Extracts gene set lists from filtered dge table
+#' 
+#' @param significant_genes_by_comparison significant_genes_by_comparison
+#'
+#' @return named list
+#' @export
+#' 
+#' @importFrom rlang .data
+#' @importFrom dplyr %>% select mutate pull
+#' @importFrom tidyr nest
+#' @importFrom purrr map set_names
+#' 
+get_significant_genes_by_comparison_lst <- function(
+		significant_genes_by_comparison
+){
+	significant_genes_by_comparison %>%
+		dplyr::select(.data$comparison, .data$symbol) %>%
+		tidyr::nest() %>%
+		dplyr::mutate(
+			data = .data$data %>% 
+				purrr::set_names(.data$comparison) %>% 
+				purrr::map(~.x$symbol)
+		) %>%
+		dplyr::pull(.data$data)
+}
+
+#' gen_upset_plot
+#'
+#' @param lst named list of items in sets
+#' @param combinations possible set combinations
+#' @param set_2_highlight the sets to highlight
+#'
+#' @return upsetjs plot
+#' @export
+#'
+#' @importFrom upsetjs upsetjs fromList setSelection chartTheme interactiveChart
+#' @importFrom dplyr %>%
+#'
+gen_upset_plot <- function(lst, combinations, set_2_highlight) {
+	upsetjs::upsetjs() %>% 
+		upsetjs::fromList(
+			lst
+		) %>% 
+		upsetjs::setSelection(
+			combinations[[set_2_highlight]]
+		) %>% 
+		upsetjs::chartTheme(
+			#theme = if_else(input$dark_mode, "dark", "light"),
+			selection.color = "#587792", hover.hint.color = "#8DB1AB"
+		) %>%
+		upsetjs::interactiveChart()
+}
+
+#' gen_venn
+#'
+#' @param lst named list of items in sets
+#' @param combinations possible set combinations
+#' @param set_2_highlight the sets to highlight
+#'
+#' @return upsetjs plot
+#' @export
+#' 
+#' @importFrom upsetjs upsetjsVennDiagram fromList setSelection chartTheme interactiveChart
+#' @importFrom dplyr %>%
+#'
+gen_venn <- function(lst, combinations, set_2_highlight) {
+	upsetjs::upsetjsVennDiagram() %>% 
+		upsetjs::fromList(
+			lst
+		) %>% 
+		upsetjs::setSelection(
+			combinations[[set_2_highlight]]
+		) %>% 
+		upsetjs::chartTheme(
+			#theme = if_else(input$dark_mode, "dark", "light"),
+			selection.color = "#587792", hover.hint.color = "#8DB1AB"
+		) %>%
+		upsetjs::interactiveChart()
+}
