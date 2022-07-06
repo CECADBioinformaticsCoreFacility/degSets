@@ -44,12 +44,12 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">results_table_DT</span><span class="op">(</span>
-  <span class="va">data</span>,
-  log2fc_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,
-  pvalue_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
-  padj_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">results_table_DT</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  log2fc_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  pvalue_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  padj_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -57,19 +57,28 @@
     <dl><dt>data</dt>
 <dd><p>a tibble with the results from a differential gene expression
 analysis (specifics analysis ...)</p></dd>
+
+
 <dt>log2fc_range</dt>
 <dd><p>set the range for the scales of the log2fc colour scale
 numeric vector length 2 Default: c(-5,5)</p></dd>
+
+
 <dt>pvalue_range</dt>
 <dd><p>set the range for the scales of the p-value colour scale
 numeric vector length 2 Default: c(0,1)</p></dd>
+
+
 <dt>padj_range</dt>
 <dd><p>set the range for the scales of the adjusted p-value colour scale
 numeric vector length 2 Default: c(0,1)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>DT::datatable</p>
+    
+
+<p>DT::datatable</p>
     </div>
 
   </div>
@@ -84,7 +93,7 @@ numeric vector length 2 Default: c(0,1)</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

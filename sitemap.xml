@@ -16,10 +16,22 @@
     <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/bind_cols_fill.html</loc>
   </url>
   <url>
+    <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/dge_filters.html</loc>
+  </url>
+  <url>
     <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/format_results.html</loc>
   </url>
   <url>
+    <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/gen_upset_plot.html</loc>
+  </url>
+  <url>
+    <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/gen_venn.html</loc>
+  </url>
+  <url>
     <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/get_intersection_genes.html</loc>
+  </url>
+  <url>
+    <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/get_significant_genes_by_comparison_lst.html</loc>
   </url>
   <url>
     <loc>https://cecadbioinformaticscorefacility.github.io/degSets/reference/index.html</loc>
