@@ -65,6 +65,7 @@ mod_sets_ui_controlbar <- function(id) {
 	## Right sidebar ----
 	bs4Dash::bs4DashControlbar(
 		id = ns("controlbar"),
+		width = 400,
 		collapsed = FALSE,
 		pinned = TRUE,
 		overlay = FALSE,
@@ -127,6 +128,7 @@ mod_sets_ui_controlbar <- function(id) {
 #' @importFrom rlang .data
 #' @importFrom shiny reactive renderUI tagList numericInput selectizeInput
 #' selectInput req reactiveValues renderText observeEvent observe moduleServer
+#' @importFrom shinyWidgets pickerInput pickerOptions
 mod_sets_server <- function(id) {
 	moduleServer( id, function(input, output, session) {
 		ns <- session$ns
@@ -280,13 +282,25 @@ mod_sets_server <- function(id) {
 		
 		output$set_selector <- renderUI({
 			#req(input$results_annotated_min_cov_grp)
-			selectInput(
-				selectize = TRUE,
+			# selectInput(
+			# 	selectize = TRUE,
+			# 	ns("set_2_highlight"), "Set to highlight",
+			# 	choices = names(set_combinations()),
+			# 	#selected = input$upset_plot_click$name
+			# 	selected = selected_comparison$comparison
+			# )
+			# 
+			shinyWidgets::pickerInput(
 				ns("set_2_highlight"), "Set to highlight",
 				choices = names(set_combinations()),
-				#selected = input$upset_plot_click$name
-				selected = selected_comparison$comparison
+				selected = selected_comparison$comparison,
+				multiple = FALSE,
+				options = shinyWidgets::pickerOptions(
+					actionsBox = TRUE, liveSearch = TRUE, size = 5
+				)
 			)
+			
+			
 		})
 		
 		## named list containing tibble of genes in selected comparisons 

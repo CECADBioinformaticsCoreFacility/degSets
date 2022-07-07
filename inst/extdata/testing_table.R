@@ -1,11 +1,11 @@
 library(dplyr)
 
-results_annotated_min_cov_grp <- readr::read_csv(
-	'/tank/richardjacton/sciebo/cecad-bioinformatics/shared_results/AG_Rybniker/stheobald/out/dge_results/results_annotated_min_cov_grp.csv'
-)
+# results_annotated_min_cov_grp <- readr::read_csv(
+# 	'/tank/richardjacton/sciebo/cecad-bioinformatics/shared_results/AG_Rybniker/stheobald/out/dge_results/results_annotated_min_cov_grp.csv'
+# )
 # results_annotated_min_cov_grp
 # colnames(results_annotated_min_cov_grp)
-testing_table <- results_annotated_min_cov_grp #%>% dplyr::group_by(comparison)
+# testing_table <- results_annotated_min_cov_grp #%>% dplyr::group_by(comparison)
 
 # testing_table <- tibble::tibble(
 # 	gene_id = paste0("prefix", rep(c("001", "002", "003"), 3)),
