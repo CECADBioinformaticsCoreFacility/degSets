@@ -3,6 +3,7 @@
 export(bind_cols_fill)
 export(dge_filters)
 export(format_results)
+export(gen_DT_lst)
 export(gen_upset_plot)
 export(gen_venn)
 export(get_intersection_genes)

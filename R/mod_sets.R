@@ -211,7 +211,8 @@ mod_sets_server <- function(id) {
 			req(
 				input$results_annotated_min_cov_grp,
 				input$minlog2FoldChange,
-				input$maxlog2FoldChange
+				input$maxlog2FoldChange,
+				input$comparisons
 			)
 			
 			# all
@@ -219,17 +220,8 @@ mod_sets_server <- function(id) {
 				dge_filters(
 					direction_filter(), input$padj,
 					input$minlog2FoldChange, input$maxlog2FoldChange
-				)
-			
-			# any
-			# results_annotated_min_cov_grp() %>%
-			# 	direction_filter()() %>%
-			# 	dplyr::filter(
-			# 		padj < input$padj,
-			# 		log2FoldChange <= input$minlog2FoldChange |
-			# 			log2FoldChange >= input$maxlog2FoldChange
-			# 	) %>%
-			# 	dplyr::group_by(comparison) 
+				) %>%
+				dplyr::filter(.data$comparison %in% input$comparisons)
 		})
 		
 		## Gene Names Set List ----
@@ -376,50 +368,11 @@ mod_sets_server <- function(id) {
 		
 		### DEG results tables DT prep ----
 		results_annotated_min_cov_grp_DTs <- reactive({
-			# req(input$results_annotated_min_cov_grp)
-			# req(significant_genes_by_comparison())
-			df <- 
-				significant_genes_by_comparison() %>% # all
-				#results_annotated_min_cov_grp() %>% # any
-				dplyr::filter(.data$symbol %in% intersection_selected_sets())	
-			###!!! alternative source for elems!
-			# if (!is.null(input$upset_plot_click$elems)) {
-			# 	df <- significant_genes_by_comparison() %>%
-			# 		dplyr::filter(symbol %in% input$upset_plot_click$elems)	
-			# }
-			# 
-			# if (input$set_2_highlight != "none") {
-			# 	df <- significant_genes_by_comparison() %>%
-			# 		dplyr::filter(symbol %in% intersection_selected_sets())	
-			# }
-			
-			maxlog2FoldChange <- max(abs(df$log2FoldChange))
-			
-			###!!!
-			df %>%
-				dplyr::group_by(.data$comparison) %>%
-				named_group_split(.data$comparison) %>%
-				#dplyr::group_split(.keep = FALSE) %>%
-				purrr::set_names(unique(df$comparison)) %>%
-				purrr::map(~{
-					.x %>% 
-						dplyr::select(-.data$comparison) %>%
-						#format_results(organism_name) %>%
-						format_results(input$species) %>%
-						#SharedData$new() %>%
-						results_table_DT(
-							log2fc_range = c(
-								-maxlog2FoldChange, maxlog2FoldChange
-							),
-							pvalue_range = c(0, quantile(
-								df$pvalue, probs = c(0.75), na.rm = TRUE
-							)),
-							padj_range = c(0, quantile(
-								df$padj, probs = c(0.75), na.rm = TRUE
-							))#,
-							#elementId = ns(.x$comparison[1])
-						)
-				})
+			req(input$species)
+			gen_DT_lst(
+				significant_genes_by_comparison(),
+				intersection_selected_sets(), input$species
+			)
 		}) 
 		
 		### DEG results tables render ----

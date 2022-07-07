@@ -417,6 +417,7 @@ get_significant_genes_by_comparison_lst <- function(
 ){
 	significant_genes_by_comparison %>%
 		dplyr::select(.data$comparison, .data$symbol) %>%
+		dplyr::group_by(.data$comparison) %>%
 		tidyr::nest() %>%
 		dplyr::mutate(
 			data = .data$data %>% 
@@ -478,4 +479,41 @@ gen_venn <- function(lst, combinations, set_2_highlight) {
 			selection.color = "#587792", hover.hint.color = "#8DB1AB"
 		) %>%
 		upsetjs::interactiveChart()
+}
+
+
+#' gen_DT_lst
+#'
+#' @param significant_genes_by_comparison  significant_genes_by_comparison
+#' @param intersection_selected_sets intersection_selected_sets 
+#' @param species The latin binomial name of the species (used to make ensembl links)
+#'
+#' @return list of DT tables objects
+#' @export
+#'
+gen_DT_lst <- function(significant_genes_by_comparison, intersection_selected_sets, species) {
+	df <- significant_genes_by_comparison %>%
+		dplyr::filter(.data$symbol %in% intersection_selected_sets)
+	
+	maxlog2FoldChange <- max(abs(df$log2FoldChange))
+	
+	df %>%
+		dplyr::group_by(.data$comparison) %>%
+		named_group_split(.data$comparison) %>%
+		purrr::map(~{
+			.x %>% 
+				dplyr::select(-.data$comparison) %>%
+				format_results(species) %>%
+				results_table_DT(
+					log2fc_range = c(
+						-maxlog2FoldChange, maxlog2FoldChange
+					),
+					pvalue_range = c(0, quantile(
+						df$pvalue, probs = c(0.75), na.rm = TRUE
+					)),
+					padj_range = c(0, quantile(
+						df$padj, probs = c(0.75), na.rm = TRUE
+					))
+				)
+		})
 }
