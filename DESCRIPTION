@@ -14,6 +14,7 @@ Imports:
     dplyr,
     DT,
     golem (>= 0.3.1),
+    openxlsx,
     purrr,
     readr,
     rlang,

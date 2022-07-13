@@ -7,28 +7,28 @@ library(dplyr)
 # colnames(results_annotated_min_cov_grp)
 # testing_table <- results_annotated_min_cov_grp #%>% dplyr::group_by(comparison)
 
-# testing_table <- tibble::tibble(
-# 	gene_id = paste0("prefix", rep(c("001", "002", "003"), 3)),
-# 	baseMean = 10,
-# 	log2FoldChange = rep(c(1, -1, 0.02), 3),
-# 	lfcSE = 0.5,
-# 	pvalue = rep(c(0.01, 0.5, 1), 3),
-# 	padj = rep(c(0.01, 0.5, 1), 3),
-# 	seqnames = "chr1",
-# 	start = 0,
-# 	end = 1000,
-# 	width = 1000,
-# 	strand = "+",
-# 	#gene_name = rep(c("abc1", "def2", "ghi3"), 3),
-# 	gene_name = c("X","Y","Z", rep(c("abc1", "def2", "ghi3"), 2)),
-# 	gene_biotype = "protein_coding",
-# 	seq_coord_system = "chromosome",
-# 	description = "a gene",
-# 	symbol = c("X","Y","Z", rep(c("abc1", "def2", "ghi3"), 2)),
-# 	entrezid = rep(c("001", "002", "003"), 3),
-# 	comparison = rep(c("A_vs_B", "A_vs_C", "B_vs_C"), each = 3)
-# ) %>%
-# 	dplyr::group_by(.data$comparison)
+testing_table <- tibble::tibble(
+	gene_id = paste0("prefix", rep(c("001", "002", "003"), 3)),
+	baseMean = 10,
+	log2FoldChange = rep(c(1, -1, 0.02), 3),
+	lfcSE = 0.5,
+	pvalue = rep(c(0.01, 0.5, 1), 3),
+	padj = rep(c(0.01, 0.5, 1), 3),
+	seqnames = "chr1",
+	start = 0,
+	end = 1000,
+	width = 1000,
+	strand = "+",
+	#gene_name = rep(c("abc1", "def2", "ghi3"), 3),
+	gene_name = c("X","Y","Z", rep(c("abc1", "def2", "ghi3"), 2)),
+	gene_biotype = "protein_coding",
+	seq_coord_system = "chromosome",
+	description = "a gene",
+	symbol = c("X","Y","Z", rep(c("abc1", "def2", "ghi3"), 2)),
+	entrezid = rep(c("001", "002", "003"), 3),
+	comparison = rep(c("A_vs_B", "A_vs_C", "B_vs_C"), each = 3)
+) %>%
+	dplyr::group_by(.data$comparison)
 
 get_significant_genes_by_comparison_lst(testing_table)
 
@@ -47,10 +47,12 @@ results_annotated_min_cov_grp <- readr::read_csv(
 
 significant_genes_by_comparison <- dge_filters(
 	results_annotated_min_cov_grp, 
-	\(x){dplyr::filter(x, .data$log2FoldChange > 0)},
-	0.05, -0.8, 0.8
-) %>%
-	filter(comparison %in% c("DC_24h_2_vs_M_24h_2", "DC_5h_2_vs_M_5h_2"))
+	# \(x){dplyr::filter(x, .data$log2FoldChange > 0)},
+	# 0.05, -0.8, 0.8
+	\(x){x},
+	1, -0.01, 0.01
+)# %>%
+	#filter(comparison %in% c("DC_24h_2_vs_M_24h_2", "DC_5h_2_vs_M_5h_2"))
 significant_genes_by_comparison
 
 
@@ -129,3 +131,49 @@ gen_DT_lst <- function(significant_genes_by_comparison, intersection_selected_se
 }
 
 gen_DT_lst(significant_genes_by_comparison, intersection_selected_sets, "Homo Sapiens")
+
+
+
+####
+
+
+ComplexHeatmap::Heatmap(
+	significant_genes_by_comparison_set_matrix,
+	col = c("0" = "white", "1" = "black"),
+	name = "member",
+	cluster_columns = FALSE, cluster_rows = FALSE,
+	show_row_dend = FALSE, show_column_dend = FALSE,
+	row_names_side = "left", column_names_side = "top",
+	row_title_side = "left", column_title_side = "top", 
+	column_names_rot = 45,
+	rect_gp = grid::gpar(col = "grey", lwd = 2)
+)
+
+
+#significant_genes_by_comparison_lst_subset %>%
+	significant_genes_by_comparison_lst %>%
+	ComplexHeatmap::list_to_matrix() %>% 
+		(function(x){x[
+		, set_combinations[[
+			names(significant_genes_by_comparison_lst)[1]
+		]],
+		drop = FALSE
+	]})() %>%
+	t() %>%
+	ComplexHeatmap::Heatmap(
+		#t(significant_genes_by_comparison_set_matrix()),
+		col = c("0" = "white", "1" = "black"),
+		name = "member",
+		cluster_columns = TRUE, cluster_rows = FALSE,
+		show_row_dend = FALSE, show_column_dend = FALSE,
+		row_names_side = "left", column_names_side = "top",
+		row_title_side = "left", column_title_side = "top", 
+		column_names_rot = 45,
+		rect_gp = grid::gpar(col = "grey", lwd = 0.2)
+	)
+	
+	
+	significant_genes_by_comparison_lst %>%
+		ComplexHeatmap::list_to_matrix() %>%
+		write.csv(., "test.csv")
+	

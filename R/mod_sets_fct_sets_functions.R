@@ -172,11 +172,11 @@ results_table_DT <- function(
 					vector(mode = "list", length = 12)
 				),
 				buttons = list(
-					I("colvis"),  # turn columns on and off
+					I("colvis")#,  # turn columns on and off
 					# "selectRows",
 					#"selectNone",
-					"csv",  # download as .csv
-					"excel"  # download as .xlsx
+					#"csv",  # download as .csv
+					#"excel"  # download as .xlsx
 				)
 			)
 		) %>%
@@ -516,4 +516,107 @@ gen_DT_lst <- function(significant_genes_by_comparison, intersection_selected_se
 					))
 				)
 		})
+}
+
+
+#' gen_df_DT_tibble
+#'
+#' @param significant_genes_by_comparison  significant_genes_by_comparison
+#' @param intersection_selected_sets intersection_selected_sets 
+#' @param species The latin binomial name of the species (used to make ensembl links)
+#'
+#' @return a nested tibble with columns for comparisons, data and DT objects as named lists
+#' @export
+#'
+gen_df_DT_tibble <- function(
+		significant_genes_by_comparison, intersection_selected_sets, species
+	) {
+	df <- significant_genes_by_comparison %>%
+		dplyr::filter(.data$symbol %in% intersection_selected_sets)
+	
+	maxlog2FoldChange <- max(abs(df$log2FoldChange))
+	
+	df %>%
+		dplyr::group_by(.data$comparison) %>%
+		tidyr::nest() %>%
+		dplyr::mutate(
+			data = .data$data %>%
+				purrr::set_names(.data$comparison),
+			DT = .data$data %>%
+				purrr::set_names(.data$comparison) %>%
+				purrr::map(~{
+				.x %>% 
+					format_results(species) %>%
+					results_table_DT(
+						log2fc_range = c(
+							-maxlog2FoldChange, maxlog2FoldChange
+						),
+						pvalue_range = c(0, quantile(
+							df$pvalue, probs = c(0.75), na.rm = TRUE
+						)),
+						padj_range = c(0, quantile(
+							df$padj, probs = c(0.75), na.rm = TRUE
+						))
+					)
+			})
+		)
+}
+
+
+#' gen_selected_sets_xlsx
+#'
+#' @param lst list of data frames
+#' @param meta metadata about the selected sets
+#' @param file xlsx output file
+#'
+#' @return filename
+#' @export
+#'
+#' @importFrom openxlsx createWorkbook createStyle addWorksheet writeData setColWidths writeDataTable freezePane conditionalFormatting saveWorkbook
+#' @importFrom stringr str_trunc
+gen_selected_sets_xlsx <- function(lst, meta, file) {
+	wb <- openxlsx::createWorkbook(title = "Genes in selected set")
+	hs <- openxlsx::createStyle(textDecoration = "bold")
+	
+	openxlsx::addWorksheet(wb, "meta")
+	openxlsx::writeData(wb, "meta", meta)
+	openxlsx::setColWidths(
+		wb, "meta", cols = 1:ncol(meta), widths = "auto"
+	)
+	
+	for (i in seq_along(lst)) {
+		name <- stringr::str_trunc(names(lst)[i], 31)
+		df <- lst[[i]]
+		openxlsx::addWorksheet(wb, name)
+		openxlsx::writeDataTable(wb, name, df, headerStyle = hs)
+		openxlsx::setColWidths(
+			wb, name, cols = 1:ncol(df), widths = "auto"
+		)
+		openxlsx::freezePane(wb, name, firstRow = TRUE)
+		clnms <- colnames(df)
+		lfc_col_idxs <- which(clnms == "log2FoldChange")
+		for (i in lfc_col_idxs) {
+			openxlsx::conditionalFormatting(
+				wb, name,
+				cols = i,
+				type = "colourScale",
+				style = c("#5e3c99", "#f7f7f7", "#e66101"),
+				rows = 2:(nrow(df) + 1)
+			)
+		}
+		pcol_idxs <- which(clnms %in% c("pvalue", "padj"))
+		for (i in pcol_idxs) {
+			openxlsx::conditionalFormatting(
+				wb, name,
+				cols = i,
+				type = "colourScale",
+				style = c("#d01c8b", "#4dac26"),
+				rows = 2:(nrow(df) + 1),
+				rule = c(0, 1)
+			)
+		}
+		
+	}
+	openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
+	file
 }

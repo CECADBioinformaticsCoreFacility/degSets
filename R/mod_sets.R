@@ -45,7 +45,23 @@ mod_sets_ui_body <- function(id){
 		### DGE results tabset output ----
 		fluidRow(
 			uiOutput(outputId = ns("dge_res"))
-		)
+		)#,
+		# fluidRow(
+		# 	bs4Dash::box(
+		# 		width = 12,
+		# 		title = shiny::h3("Set Membership Matrix"),
+		# 		solidHeader = FALSE,
+		# 		status = "primary",
+		# 		# h4(textOutput("upset_plot_selected")),
+		# 		#"Box body",
+		# 		id = ns("set_membership_matrix_plot_box"),
+		# 		collapsible = TRUE,
+		# 		closable = FALSE,
+		# 		maximizable = TRUE,
+		# 		
+		# 		shiny::plotOutput(ns("set_membership_matrix_plot"))
+		# 	)
+		# )
 	)
 }
 
@@ -57,7 +73,7 @@ mod_sets_ui_body <- function(id){
 #'
 #' @noRd 
 #'
-#' @importFrom shiny NS tagList uiOutput fileInput textInput numericInput uiOutput verbatimTextOutput
+#' @importFrom shiny NS tagList uiOutput fileInput textInput numericInput uiOutput verbatimTextOutput downloadButton
 #' @importFrom shinyWidgets radioGroupButtons
 #' @importFrom bs4Dash bs4DashControlbar controlbarItem
 mod_sets_ui_controlbar <- function(id) {
@@ -112,8 +128,9 @@ mod_sets_ui_controlbar <- function(id) {
 			# 	),
 			# 	choices = all_comparisons
 			# ),
-			uiOutput(ns("set_selector"))
-			
+			uiOutput(ns("set_selector")),
+			downloadButton(ns("set_matrix"), "Save Set Membership Matrix"),
+			downloadButton(ns("selected_sets_xlsx"), "Download selected sets")
 		)
 	)
 }
@@ -126,7 +143,7 @@ mod_sets_ui_controlbar <- function(id) {
 #' @importFrom dplyr %>% if_else group_keys group_split
 #' @importFrom bs4Dash tabBox 
 #' @importFrom rlang .data
-#' @importFrom shiny reactive renderUI tagList numericInput selectizeInput
+#' @importFrom shiny reactive renderUI tagList numericInput selectizeInput downloadHandler
 #' selectInput req reactiveValues renderText observeEvent observe moduleServer
 #' @importFrom shinyWidgets pickerInput pickerOptions
 mod_sets_server <- function(id) {
@@ -242,6 +259,39 @@ mod_sets_server <- function(id) {
 			significant_genes_by_comparison_lst() %>%
 				ComplexHeatmap::list_to_matrix()
 		})
+		
+		output$set_matrix <- shiny::downloadHandler(
+			filename = "filtered_genes_set_membership_matrix.csv",
+			content = function(file) {
+				significant_genes_by_comparison_set_matrix() %>%
+					write.csv(.data, file)
+			}
+		)
+		
+		# output$set_membership_matrix_plot <- shiny::renderPlot({
+		# 	req(input$set_2_highlight)
+		# 	significant_genes_by_comparison_lst_subset() %>%
+		# 	#significant_genes_by_comparison_lst() %>%
+		# 		ComplexHeatmap::list_to_matrix() %>% 
+		# 		(function(x){x[ , set_combinations()[[
+		# 				#names(significant_genes_by_comparison_lst)[1]
+		# 				input$set_2_highlight
+		# 			]],
+		# 			drop = FALSE
+		# 		]})() %>%
+		# 		t() %>%
+		# 		ComplexHeatmap::Heatmap(
+		# 			#t(significant_genes_by_comparison_set_matrix()),
+		# 			col = c("0" = "white", "1" = "black"),
+		# 			name = "member",
+		# 			cluster_columns = TRUE, cluster_rows = FALSE,
+		# 			show_row_dend = FALSE, show_column_dend = FALSE,
+		# 			row_names_side = "left", column_names_side = "top",
+		# 			row_title_side = "left", column_title_side = "top", 
+		# 			column_names_rot = 45,
+		# 			rect_gp = grid::gpar(col = "grey", lwd = 0.2)
+		# 		)
+		# })
 		
 		intersection_selected_sets <- reactive({
 			req(input$set_2_highlight)
@@ -383,20 +433,60 @@ mod_sets_server <- function(id) {
 		### DEG results tables DT prep ----
 		results_annotated_min_cov_grp_DTs <- reactive({
 			req(input$species)
-			gen_DT_lst(
+			#gen_DT_lst(
+			gen_df_DT_tibble(
 				significant_genes_by_comparison(),
 				intersection_selected_sets(), input$species
 			)
 		}) 
 		
+		# Selected sets download ----
+		output$selected_sets_xlsx <- shiny::downloadHandler(
+			filename = "selected_sets.xlsx",
+			content = function(file) {
+				gen_selected_sets_xlsx(
+					results_annotated_min_cov_grp_DTs()$data[sets_to_show()],
+					tibble(
+						name = c(
+							"Adjusted p-value cut-off threshold",
+							"lower log2FC limit",
+							"upper log2FC limit",
+							"directional",
+							"comparisons",
+							"sets to selected"
+						), 
+						value = c(
+							input$padj,
+							input$minlog2FoldChange,
+							input$maxlog2FoldChange,
+							input$directional,
+							paste0(input$comparisons, collapse = ", "),
+							paste0(sets_to_show(), collapse = ", ")
+						)
+					),
+					file = file
+				)
+			}
+		)
+		
+		sets_to_show <- reactive({
+			req(input$comparisons)
+			sets_to_show <- input$comparisons
+			selected_sets <- ""
+			if(!is.null(input$set_2_highlight)) {
+				selected_sets <- set_combinations()[[input$set_2_highlight]]
+			}
+			if(selected_sets[1] != "") {
+				sets_to_show <- selected_sets
+			}
+			sets_to_show
+		})
+		
 		### DEG results tables render ----
 		output$dge_res <- renderUI({
-			req(input$comparisons)
-			# req(input$results_annotated_min_cov_grp)
-			# req(results_annotated_min_cov_grp_DTs())
-			lst_of_tbls <- purrr::map(input$comparisons, ~{tabPanel(
+			lst_of_tbls <- purrr::map(sets_to_show(), ~{tabPanel(
 				title = .x, DT::renderDataTable(
-					results_annotated_min_cov_grp_DTs()[[.x]], server = TRUE
+					results_annotated_min_cov_grp_DTs()$DT[[.x]], server = TRUE
 				)
 			)}) 
 			tabBox(
@@ -406,7 +496,7 @@ mod_sets_server <- function(id) {
 				maximizable = TRUE,
 				solidHeader = FALSE,
 				status = "primary",
-				selected = tail(input$comparisons, 1),
+				selected = tail(sets_to_show(), 1),
 				type = "tabs",
 				.list = lst_of_tbls
 			)
