@@ -645,9 +645,9 @@ volcano_plotter <- function(df) {
 		ggplot2::scale_color_manual(
 			values = c("TRUE" = "red", "FALSE" = "black")
 		) +
-		ggrepel::geom_label_repel(
+		ggrepel::geom_text_repel(
 			data = df %>% dplyr::filter(.data$selected == TRUE),
-			ggplot2::aes(text = .data$symbol)
+			ggplot2::aes(label = .data$symbol)
 		) + 
 		ggplot2::facet_wrap(~.data$comparison) +
 		ggplot2::labs(
