@@ -177,3 +177,23 @@ ComplexHeatmap::Heatmap(
 		ComplexHeatmap::list_to_matrix() %>%
 		write.csv(., "test.csv")
 	
+
+#tmp %>% dplyr::select(-DT) %>% tidyr::unnest(data) 
+	
+volcano_plotter <- function(df) {
+	plot <- ggplot2::ggplot(
+		df, ggplot2::aes(.data$log2FoldChange, -log10(.data$pvalue))
+	) + 
+		ggplot2::geom_point() + 
+		ggplot2::facet_wrap(~.data$comparison) +
+		ggplot2::labs(
+			x = latex2exp::TeX("$log_2(Fold Change)$"),
+			y = latex2exp::TeX("$-log_{10}(p-value)$")
+		) + 
+		ggplot2::theme_bw()
+	
+	plot
+}
+
+tmp %>% 
+	volcano_plotter()

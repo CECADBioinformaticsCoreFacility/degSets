@@ -44,24 +44,28 @@ mod_sets_ui_body <- function(id){
 		),
 		### DGE results tabset output ----
 		fluidRow(
+			bs4Dash::box(
+				width = 12,
+				title = shiny::h3("Volcano Plots"),
+				#title = shiny::h3("Set Membership Matrix"),
+				solidHeader = FALSE,
+				status = "primary",
+				# h4(textOutput("upset_plot_selected")),
+				#"Box body",
+				#id = ns("set_membership_matrix_plot_box"),
+				id = ns("volcano_plot_box"),
+				collapsible = TRUE,
+				closable = FALSE,
+				maximizable = TRUE,
+				collapsed = TRUE,
+
+				#shiny::plotOutput(ns("set_membership_matrix_plot"))
+				shiny::plotOutput(ns("volcano_plots"))
+			)
+		),
+		fluidRow(
 			uiOutput(outputId = ns("dge_res"))
 		)#,
-		# fluidRow(
-		# 	bs4Dash::box(
-		# 		width = 12,
-		# 		title = shiny::h3("Set Membership Matrix"),
-		# 		solidHeader = FALSE,
-		# 		status = "primary",
-		# 		# h4(textOutput("upset_plot_selected")),
-		# 		#"Box body",
-		# 		id = ns("set_membership_matrix_plot_box"),
-		# 		collapsible = TRUE,
-		# 		closable = FALSE,
-		# 		maximizable = TRUE,
-		# 		
-		# 		shiny::plotOutput(ns("set_membership_matrix_plot"))
-		# 	)
-		# )
 	)
 }
 
@@ -143,7 +147,7 @@ mod_sets_ui_controlbar <- function(id) {
 #' @importFrom dplyr %>% if_else group_keys group_split
 #' @importFrom bs4Dash tabBox 
 #' @importFrom rlang .data
-#' @importFrom shiny reactive renderUI tagList numericInput selectizeInput downloadHandler
+#' @importFrom shiny reactive renderUI tagList numericInput selectizeInput downloadHandler renderPlot
 #' selectInput req reactiveValues renderText observeEvent observe moduleServer
 #' @importFrom shinyWidgets pickerInput pickerOptions
 mod_sets_server <- function(id) {
@@ -484,11 +488,26 @@ mod_sets_server <- function(id) {
 		
 		### DEG results tables render ----
 		output$dge_res <- renderUI({
-			lst_of_tbls <- purrr::map(sets_to_show(), ~{tabPanel(
-				title = .x, DT::renderDataTable(
-					results_annotated_min_cov_grp_DTs()$DT[[.x]], server = TRUE
+			lst_of_tbls <- purrr::map(sets_to_show(), ~{
+				output[[paste0("DT_", .x)]] <- DT::renderDataTable(
+					results_annotated_min_cov_grp_DTs()$DT[[.x]],
+					server = TRUE
 				)
-			)}) 
+				tabPanel(
+					title = .x,
+					DT::dataTableOutput(ns(paste0("DT_", .x)))
+					#output[[paste0("DT_", .x)]]
+				)
+			}) 
+			# lst_of_tbls <- purrr::map(sets_to_show(), ~{
+			# 	tabPanel(
+			# 		title = .x,
+			# 		DT::renderDataTable(
+			# 			results_annotated_min_cov_grp_DTs()$DT[[.x]], server = TRUE
+			# 		)
+			# 	)
+			# }) 
+			
 			tabBox(
 				width = 12,
 				id = "tabcard",
@@ -501,6 +520,28 @@ mod_sets_server <- function(id) {
 				.list = lst_of_tbls
 			)
 		})
+		
+		output$volcano_plots <- shiny::renderPlot({
+			# do.call(req, purrr::map(sets_to_show(),
+			# 	~{input[[paste0("DT_", .x)]]}
+			# ))
+			
+			results_annotated_min_cov_grp_DTs() %>%
+				dplyr::filter(.data$comparison %in% sets_to_show()) %>%
+				dplyr::mutate(
+					data = purrr::map2(.data$data, .data$comparison, ~{
+						.x %>% dplyr::mutate(selected = 
+							dplyr::row_number() %in% input[[
+								paste0("DT_", .y, "_rows_selected")
+							]])
+					})
+				) %>%
+				dplyr::select(-.data$DT) %>% 
+				tidyr::unnest(.data$data) %>%
+				volcano_plotter()
+		})
+		
+		
 	})
 }
     

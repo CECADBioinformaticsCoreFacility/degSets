@@ -13,7 +13,10 @@ Imports:
     config (>= 0.3.1),
     dplyr,
     DT,
+    ggplot2,
+    ggrepel,
     golem (>= 0.3.1),
+    latex2exp,
     openxlsx,
     purrr,
     readr,
@@ -31,8 +34,7 @@ Repository: Bioconductor
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.0
-URL: https://renkulab.io/gitlab/racton/degSets,
-    https://cecadbioinformaticscorefacility.github.io/degSets
+URL: https://cecadbioinformaticscorefacility.github.io/degSets
 BugReports: https://renkulab.io/gitlab/racton/degSets/issues
 Suggests: 
     covr,

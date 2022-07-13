@@ -145,7 +145,7 @@ results_table_DT <- function(
 				#"Select",
 				"Scroller"  # for scrolling down the rows rather than pagination
 			),
-			selection = 'none',
+			selection = 'multiple',
 			rownames = FALSE,  # remove rownames
 			style = "bootstrap",
 			class = "compact",
@@ -619,4 +619,42 @@ gen_selected_sets_xlsx <- function(lst, meta, file) {
 	}
 	openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 	file
+}
+
+
+#' volcano_plotter
+#'
+#' @param df data
+#'
+#' @return plot
+#' @export
+#' 
+#' @importFrom ggplot2 ggplot aes geom_point facet_wrap labs theme_bw scale_color_manual
+#' @importFrom latex2exp TeX
+#' @importFrom rlang .data
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom dplyr %>% filter
+#'
+volcano_plotter <- function(df) {
+	plot <- ggplot2::ggplot(
+		df, ggplot2::aes(.data$log2FoldChange, -log10(.data$pvalue))
+	) + 
+		ggplot2::geom_point(
+			ggplot2::aes(color = .data$selected), show.legend = FALSE
+		) + 
+		ggplot2::scale_color_manual(
+			values = c("TRUE" = "red", "FALSE" = "black")
+		) +
+		ggrepel::geom_label_repel(
+			data = df %>% dplyr::filter(.data$selected == TRUE),
+			ggplot2::aes(text = .data$symbol)
+		) + 
+		ggplot2::facet_wrap(~.data$comparison) +
+		ggplot2::labs(
+			x = latex2exp::TeX("$log_2(Fold Change)$"),
+			y = latex2exp::TeX("$-log_{10}(p-value)$")
+		) + 
+		ggplot2::theme_bw()
+	
+	plot
 }
