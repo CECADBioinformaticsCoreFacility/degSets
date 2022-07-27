@@ -268,7 +268,8 @@ mod_sets_server <- function(id) {
 			filename = "filtered_genes_set_membership_matrix.csv",
 			content = function(file) {
 				significant_genes_by_comparison_set_matrix() %>%
-					write.csv(.data, file)
+					data.matrix() %>%
+					write.csv(file = file)
 			}
 		)
 		
