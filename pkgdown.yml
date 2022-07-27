@@ -2,7 +2,7 @@ pandoc: 2.7.3
 pkgdown: 2.0.5
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-07-13T17:05Z
+last_built: 2022-07-27T14:29Z
 urls:
   reference: https://cecadbioinformaticscorefacility.github.io/degSets/reference
   article: https://cecadbioinformaticscorefacility.github.io/degSets/articles
