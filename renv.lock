@@ -475,34 +475,6 @@
       "Hash": "022c42d49c28e95d69ca60446dbabf88",
       "Requirements": []
     },
-    "degSets": {
-      "Package": "degSets",
-      "Version": "0.0.0.9000",
-      "Source": "Repository",
-      "Repository": "Bioconductor",
-      "Remotes": "richardjacton/colourScaleR",
-      "Hash": "cecdef6dc21bab9e88c6f61036a6c80e",
-      "Requirements": [
-        "BiocManager",
-        "ComplexHeatmap",
-        "DT",
-        "bs4Dash",
-        "colourScaleR",
-        "config",
-        "dplyr",
-        "golem",
-        "purrr",
-        "readr",
-        "rlang",
-        "shiny",
-        "shinyWidgets",
-        "stringr",
-        "tibble",
-        "tidyr",
-        "upsetjs",
-        "waiter"
-      ]
-    },
     "desc": {
       "Package": "desc",
       "Version": "1.4.1",
@@ -736,6 +708,19 @@
         "scales",
         "tibble",
         "withr"
+      ]
+    },
+    "ggrepel": {
+      "Package": "ggrepel",
+      "Version": "0.9.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "08ab869f37e6a7741a64ab9069bcb67d",
+      "Requirements": [
+        "Rcpp",
+        "ggplot2",
+        "rlang",
+        "scales"
       ]
     },
     "gh": {
@@ -982,6 +967,17 @@
         "rlang"
       ]
     },
+    "latex2exp": {
+      "Package": "latex2exp",
+      "Version": "0.9.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "e98c8626b5142cba49800be7abc4021f",
+      "Requirements": [
+        "magrittr",
+        "stringr"
+      ]
+    },
     "lattice": {
       "Package": "lattice",
       "Version": "0.20-45",
@@ -1083,6 +1079,18 @@
       "Hash": "6d3bef2e305f55c705c674653c7d7d3d",
       "Requirements": [
         "askpass"
+      ]
+    },
+    "openxlsx": {
+      "Package": "openxlsx",
+      "Version": "4.2.5",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "fc5e0e85d3a1e4282f04f303627b7e72",
+      "Requirements": [
+        "Rcpp",
+        "stringi",
+        "zip"
       ]
     },
     "packrat": {
