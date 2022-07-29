@@ -5,9 +5,9 @@ account: richardjacton
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6444294
-bundleId: 6145790
+bundleId: 6145859
 url: https://richardjacton.shinyapps.io/degSets/
-when: 1659103128.99113
-lastSyncTime: 1659103128.99114
+when: 1659104245.81185
+lastSyncTime: 1659104245.81186
 asMultiple: FALSE
 asStatic: FALSE

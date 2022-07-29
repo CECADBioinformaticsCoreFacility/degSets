@@ -316,7 +316,22 @@ get_intersection_genes <- function(mat, sets) { #, mode = "distinct"
 	# 	rownames(mat)[length(sets) == rowSums(mat[, sets, drop = FALSE])]
 	# } else if(mode == "distinct") {
 	} else {
+		if(length(sets) > 1 & length(sets) < ncol(mat)) {
+			mat <- mat[
+				!as.logical(rowSums(
+					mat[, !colnames(mat) %in% sets, drop = FALSE]
+				)),
+				sets , drop = FALSE
+			]
+			# rownames(
+			# 	mat[
+			# 		rowSums(mat[, sets, drop = FALSE]) == length(sets), ,
+			# 		drop = FALSE
+			# 	]
+			# )
+		} #else {
 		rownames(mat[rowSums(mat) == length(sets), , drop = FALSE])
+		#}
 	}
 }
 
@@ -448,7 +463,7 @@ get_significant_genes_by_comparison_lst <- function(
 gen_upset_plot <- function(lst, combinations, set_2_highlight) {
 	upsetjs::upsetjs() %>% 
 		upsetjs::fromList(
-			lst, c_type = "distinctIntersection"
+			lst, c_type = "distinctIntersection"#, order.by = "degree"
 		) %>% 
 		upsetjs::setSelection(
 			combinations[[set_2_highlight]]
