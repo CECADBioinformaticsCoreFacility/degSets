@@ -119,7 +119,7 @@ test_that("list conversion", {
 })
 
 test_that("inner join genes from matrix", {
-	expect_equal(
+	expect_null(
 		get_intersection_genes(
 			ComplexHeatmap::list_to_matrix(list(
 				"A_vs_B" = c("abc1", "def2"),
@@ -127,8 +127,7 @@ test_that("inner join genes from matrix", {
 				"B_vs_C" = c("abc1", "def2")
 			)),
 			c("A_vs_B", "A_vs_C")
-		),
-		c("abc1", "def2")
+		)
 	)
 	expect_equal(
 		get_intersection_genes(
@@ -139,7 +138,7 @@ test_that("inner join genes from matrix", {
 			)),
 			c("A_vs_B", "A_vs_C")
 		),
-		c("abc1", "def2", "x")
+		c("x")
 	)
 	expect_equal(
 		get_intersection_genes(
@@ -150,7 +149,7 @@ test_that("inner join genes from matrix", {
 			)),
 			c("A_vs_B", "B_vs_C")
 		),
-		c("abc1", "def2")
+		c("x")
 		
 	)
 	expect_equal(

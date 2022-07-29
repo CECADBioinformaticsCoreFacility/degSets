@@ -307,9 +307,11 @@ set_list_2_combinations <- function(set_list, add_empty = TRUE) {
 #'
 get_intersection_genes <- function(mat, sets) { #, mode = "distinct"
 	if(is.null(sets)) {
-		return(rownames(mat))
+		return(rownames(mat)) 
 	} else if(any(sets %in% c("none", "", NA))) {
 		return(rownames(mat))
+	} else if(!all(sets %in% colnames(mat))) {
+		stop() 
 	# } else if(mode == "intersect") {
 	# 	rownames(mat)[length(sets) == rowSums(mat[, sets, drop = FALSE])]
 	# } else if(mode == "distinct") {
