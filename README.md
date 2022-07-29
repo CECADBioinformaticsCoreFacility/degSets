@@ -34,6 +34,8 @@ You can find an example instance of degSets hosted at [shinyapps.io](https://ric
 
 ## TODO
 
+- [ ] BUG upset selection and highlighting not working clicking one sometimes selects another, venn selection works fine but subsets are not highlighted. (following change to distinct sets)
+
 - [ ] update on button press not immediately when p-value, LFC thresholds are changed
 - [ ] better solution to white/black font colour change in cell background colour
 - [ ] test coverage for other main functions in modsets functions
