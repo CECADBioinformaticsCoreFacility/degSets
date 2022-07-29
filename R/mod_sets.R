@@ -260,7 +260,8 @@ mod_sets_server <- function(id) {
 		})
 		
 		significant_genes_by_comparison_set_matrix <- reactive({
-			significant_genes_by_comparison_lst() %>%
+			#significant_genes_by_comparison_lst() %>%
+			significant_genes_by_comparison_lst_subset() %>%
 				ComplexHeatmap::list_to_matrix()
 		})
 		

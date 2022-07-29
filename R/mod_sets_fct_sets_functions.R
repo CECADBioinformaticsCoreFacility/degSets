@@ -300,17 +300,21 @@ set_list_2_combinations <- function(set_list, add_empty = TRUE) {
 #'
 #' @param mat binary set membership matrix (ComplexHeatmap)
 #' @param sets vector of names of sets for which you want the intersection
+# #' @param mode "distinct" or "intersect" (see: https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html#upset-mode)
 #'
 #' @return character vector of gene names
 #' @export
 #'
-get_intersection_genes <- function(mat, sets) {
+get_intersection_genes <- function(mat, sets) { #, mode = "distinct"
 	if(is.null(sets)) {
 		return(rownames(mat))
 	} else if(any(sets %in% c("none", "", NA))) {
 		return(rownames(mat))
+	# } else if(mode == "intersect") {
+	# 	rownames(mat)[length(sets) == rowSums(mat[, sets, drop = FALSE])]
+	# } else if(mode == "distinct") {
 	} else {
-		rownames(mat)[length(sets) == rowSums(mat[, sets, drop = FALSE])]
+		rownames(mat[rowSums(mat) == length(sets), , drop = FALSE])
 	}
 }
 
@@ -442,7 +446,7 @@ get_significant_genes_by_comparison_lst <- function(
 gen_upset_plot <- function(lst, combinations, set_2_highlight) {
 	upsetjs::upsetjs() %>% 
 		upsetjs::fromList(
-			lst
+			lst, c_type = "distinctIntersection"
 		) %>% 
 		upsetjs::setSelection(
 			combinations[[set_2_highlight]]

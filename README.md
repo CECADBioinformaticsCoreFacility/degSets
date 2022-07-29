@@ -37,5 +37,3 @@ You can find an example instance of degSets hosted at [shinyapps.io](https://ric
 - [ ] update on button press not immediately when p-value, LFC thresholds are changed
 - [ ] better solution to white/black font colour change in cell background colour
 - [ ] test coverage for other main functions in modsets functions
-
-
